@@ -67,13 +67,36 @@ docs/tasks.md      是否存在？
 读取 project.md 中的「技术栈」字段，对照 references/templates.md 中的识别规则确定课程类型。
 
 **Step 3：生成 docs/structure.md**
-套用 references/templates.md 中对应课程的 structure 模板，填入 project.md 的内容后写入。
+套用 references/templates.md 中「一、structure.md 模板」对应课程部分，填入 project.md 的内容后写入。
+
+**Step 3.5：生成 docs/architecture.md（仅 Spring Boot 项目执行）**
+如果课程类型为 Spring Boot，额外执行此步：
+- 套用 references/templates.md 中「二、architecture.md 模板」的后端和前端两套结构
+- 后端架构：按功能模块逐一列出各层文件规范（controller / service / repository / entity / dto）
+- 前端架构：列出目录结构、各层职责、页面与接口对应关系
+- 写入 docs/architecture.md
 
 **Step 4：生成 docs/tasks.md**
-根据 project.md 的核心功能列表，套用 references/templates.md 中的 tasks 模板，生成 3～5 个任务后写入。
+根据 project.md 的核心功能列表，套用 references/templates.md 中「三、tasks.md 模板」生成 3～5 个任务后写入。
+Spring Boot 项目的每个任务需同时注明后端目标和前端目标。
 
 **Step 5：完成提示**
 
+Spring Boot 项目输出：
+> 「文档已生成：
+> ✅ docs/project.md
+> ✅ docs/structure.md　← 功能需求层（模块、页面、接口清单）
+> ✅ docs/architecture.md　← 代码架构层（前后端目录结构和分层规范）
+> ✅ docs/tasks.md
+>
+> 当前任务清单：
+> 1. [任务1]
+> 2. [任务2]
+> 3. [任务3]
+>
+> 你想从哪个任务开始？」
+
+其他课程输出：
 > 「文档已生成：
 > ✅ docs/project.md
 > ✅ docs/structure.md
