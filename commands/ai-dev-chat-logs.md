@@ -1,14 +1,15 @@
 # 指令：/ai-dev-chat-logs
 
-将当前对话整理为聊天记录，并导出到 `records/chat-logs/` 目录。
+将当前对话整理为聊天记录，并导出到当前使用项目的本地 `records/chat-logs/` 目录。
 
 这是记录归档命令，不负责生成项目文档，也不负责进入开发模式。
+不要把聊天记录保存在 skill 仓库自身目录中。
 
 ## 你的任务
 
 从当前对话中提取聊天内容，整理后保存到：
 
-- `records/chat-logs/YYYY-MM-DD-HHmm-[topic].md`
+- `当前使用项目/records/chat-logs/YYYY-MM-DD-HHmm-[topic].md`
 
 如果没有明确主题，文件名中的 `[topic]` 用 `session`。
 
@@ -64,8 +65,9 @@
 - 不要补造不存在的用户消息
 - 不要继续生成 `docs/project.md`、`docs/structure.md`、`docs/tasks.md`
 - 不要把它当成“进入开发”的命令；那个职责属于 `/ai-dev-init`
+- 不要把导出结果写回 skill 仓库自身
 
 ## 完成后说
 
-> 聊天记录已经保存到 `records/chat-logs/`。
+> 聊天记录已经保存到当前使用项目的 `records/chat-logs/`。
 > 如果你接下来要正式开始开发，请使用 `/ai-dev-init` 生成项目文档和任务清单。
