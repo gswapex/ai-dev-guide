@@ -1,0 +1,1583 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>小米之家 · 门店管理系统</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --mi-orange: #FF6900;
+    --mi-orange-light: #FF8C38;
+    --mi-orange-dim: rgba(255,105,0,0.08);
+    --mi-black: #1A1A1A;
+    --mi-gray-dark: #333333;
+    --mi-gray: #666666;
+    --mi-gray-light: #999999;
+    --mi-border: #EBEBEB;
+    --mi-bg: #F5F5F5;
+    --mi-white: #FFFFFF;
+    --sidebar-w: 220px;
+    --header-h: 56px;
+    --shadow-sm: 0 1px 4px rgba(0,0,0,0.06);
+    --shadow-md: 0 4px 16px rgba(0,0,0,0.10);
+    --radius: 8px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Noto Sans SC', -apple-system, sans-serif;
+    background: var(--mi-bg);
+    color: var(--mi-black);
+    font-size: 14px;
+    overflow: hidden;
+    height: 100vh;
+  }
+
+  /* ── LOGIN PAGE ── */
+  #page-login {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    background: linear-gradient(135deg, #1A1A1A 0%, #2D2D2D 50%, #FF6900 150%);
+    position: fixed; inset: 0; z-index: 999;
+    transition: opacity 0.4s ease;
+  }
+  #page-login.hidden { opacity: 0; pointer-events: none; }
+
+  .login-card {
+    background: #fff;
+    border-radius: 16px;
+    width: 400px;
+    padding: 48px 40px 40px;
+    box-shadow: 0 24px 64px rgba(0,0,0,0.3);
+  }
+  .login-logo {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 32px;
+  }
+  .login-logo .mi-icon {
+    width: 36px; height: 36px;
+    background: var(--mi-orange);
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-weight: 700; font-size: 18px; letter-spacing: -1px;
+  }
+  .login-logo span { font-size: 18px; font-weight: 700; color: var(--mi-black); }
+  .login-logo small { font-size: 12px; color: var(--mi-gray-light); display: block; font-weight: 400; }
+  .login-title { font-size: 22px; font-weight: 700; margin-bottom: 8px; }
+  .login-sub { color: var(--mi-gray); font-size: 13px; margin-bottom: 32px; }
+
+  .form-group { margin-bottom: 18px; }
+  .form-group label { display: block; font-size: 13px; color: var(--mi-gray); margin-bottom: 6px; font-weight: 500; }
+  .form-group input {
+    width: 100%; height: 44px;
+    border: 1.5px solid var(--mi-border);
+    border-radius: var(--radius);
+    padding: 0 14px;
+    font-size: 14px; color: var(--mi-black);
+    outline: none; transition: border-color 0.2s;
+    font-family: inherit;
+  }
+  .form-group input:focus { border-color: var(--mi-orange); }
+  .form-group input::placeholder { color: #C8C8C8; }
+
+  .btn-login {
+    width: 100%; height: 46px;
+    background: var(--mi-orange);
+    color: #fff; border: none;
+    border-radius: var(--radius);
+    font-size: 15px; font-weight: 600;
+    cursor: pointer; letter-spacing: 1px;
+    transition: background 0.2s, transform 0.1s;
+    font-family: inherit;
+    margin-top: 8px;
+  }
+  .btn-login:hover { background: var(--mi-orange-light); }
+  .btn-login:active { transform: scale(0.98); }
+
+  .login-hint { margin-top: 20px; text-align: center; font-size: 12px; color: #C0C0C0; }
+  .login-hint span { color: var(--mi-orange); cursor: pointer; }
+
+  /* ── APP SHELL ── */
+  #app { display: none; height: 100vh; flex-direction: column; }
+  #app.visible { display: flex; }
+
+  /* Header */
+  .app-header {
+    height: var(--header-h);
+    background: var(--mi-white);
+    border-bottom: 1px solid var(--mi-border);
+    display: flex; align-items: center;
+    padding: 0 20px 0 0;
+    gap: 0; flex-shrink: 0;
+    box-shadow: var(--shadow-sm);
+    position: relative; z-index: 10;
+  }
+  .header-brand {
+    width: var(--sidebar-w);
+    display: flex; align-items: center; gap: 10px;
+    padding: 0 20px;
+    border-right: 1px solid var(--mi-border);
+    height: 100%;
+    flex-shrink: 0;
+  }
+  .header-brand .mi-icon {
+    width: 28px; height: 28px;
+    background: var(--mi-orange);
+    border-radius: 5px;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-weight: 700; font-size: 13px;
+  }
+  .header-brand .brand-text { font-size: 14px; font-weight: 700; }
+  .header-brand .brand-sub { font-size: 11px; color: var(--mi-gray-light); }
+
+  .header-main { flex: 1; display: flex; align-items: center; padding: 0 20px; gap: 12px; }
+  .breadcrumb { font-size: 13px; color: var(--mi-gray); }
+  .breadcrumb span { color: var(--mi-orange); font-weight: 500; }
+
+  .header-actions { display: flex; align-items: center; gap: 16px; margin-left: auto; }
+  .header-badge {
+    position: relative; cursor: pointer;
+    width: 32px; height: 32px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 50%; transition: background 0.2s;
+  }
+  .header-badge:hover { background: var(--mi-bg); }
+  .badge-dot {
+    position: absolute; top: 4px; right: 4px;
+    width: 8px; height: 8px;
+    background: var(--mi-orange); border-radius: 50%;
+    border: 2px solid #fff;
+  }
+  .header-icon { font-size: 18px; }
+
+  .avatar {
+    width: 32px; height: 32px;
+    background: var(--mi-orange);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-size: 13px; font-weight: 600;
+    cursor: pointer;
+  }
+  .header-user { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+  .header-user-name { font-size: 13px; font-weight: 500; }
+  .header-user-role { font-size: 11px; color: var(--mi-gray-light); }
+
+  /* Body */
+  .app-body { display: flex; flex: 1; overflow: hidden; }
+
+  /* Sidebar */
+  .sidebar {
+    width: var(--sidebar-w);
+    background: var(--mi-white);
+    border-right: 1px solid var(--mi-border);
+    overflow-y: auto; flex-shrink: 0;
+    padding: 12px 0;
+  }
+  .sidebar::-webkit-scrollbar { width: 4px; }
+  .sidebar::-webkit-scrollbar-thumb { background: #e0e0e0; border-radius: 2px; }
+
+  .nav-section { padding: 0 12px; margin-bottom: 4px; }
+  .nav-section-title {
+    font-size: 11px; color: var(--mi-gray-light);
+    font-weight: 600; letter-spacing: 0.8px;
+    padding: 12px 8px 6px;
+    text-transform: uppercase;
+  }
+  .nav-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 12px;
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: all 0.15s;
+    color: var(--mi-gray);
+    font-size: 13.5px; font-weight: 500;
+    position: relative;
+  }
+  .nav-item:hover { background: var(--mi-bg); color: var(--mi-black); }
+  .nav-item.active {
+    background: var(--mi-orange-dim);
+    color: var(--mi-orange);
+  }
+  .nav-item.active::before {
+    content: '';
+    position: absolute; left: 0; top: 20%; bottom: 20%;
+    width: 3px; background: var(--mi-orange);
+    border-radius: 0 2px 2px 0;
+    margin-left: -12px;
+  }
+  .nav-icon { font-size: 16px; width: 20px; text-align: center; }
+  .nav-badge {
+    margin-left: auto; font-size: 11px;
+    background: var(--mi-orange); color: #fff;
+    padding: 1px 7px; border-radius: 20px; font-weight: 600;
+  }
+
+  /* Content */
+  .content { flex: 1; overflow-y: auto; padding: 24px; }
+  .content::-webkit-scrollbar { width: 6px; }
+  .content::-webkit-scrollbar-thumb { background: #ddd; border-radius: 3px; }
+
+  .page { display: none; animation: fadeIn 0.2s ease; }
+  .page.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* Page Header */
+  .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+  .page-title { font-size: 20px; font-weight: 700; }
+  .page-sub { font-size: 13px; color: var(--mi-gray); margin-top: 2px; }
+
+  /* Buttons */
+  .btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 0 16px; height: 36px;
+    border-radius: var(--radius); font-size: 13px; font-weight: 500;
+    cursor: pointer; border: none; transition: all 0.2s;
+    font-family: inherit;
+  }
+  .btn-primary { background: var(--mi-orange); color: #fff; }
+  .btn-primary:hover { background: var(--mi-orange-light); }
+  .btn-outline {
+    background: #fff; color: var(--mi-gray-dark);
+    border: 1.5px solid var(--mi-border);
+  }
+  .btn-outline:hover { border-color: var(--mi-orange); color: var(--mi-orange); }
+  .btn-sm { height: 30px; padding: 0 12px; font-size: 12px; }
+  .btn-danger { background: #fff; color: #e53935; border: 1.5px solid #FFCDD2; }
+  .btn-danger:hover { background: #FFEBEE; }
+
+  /* Cards */
+  .card {
+    background: var(--mi-white); border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--mi-border);
+  }
+  .card-body { padding: 20px; }
+
+  /* Stat Cards */
+  .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 20px; }
+  .stat-card {
+    background: var(--mi-white); border-radius: var(--radius);
+    border: 1px solid var(--mi-border);
+    padding: 20px;
+    box-shadow: var(--shadow-sm);
+    position: relative; overflow: hidden;
+    transition: box-shadow 0.2s;
+  }
+  .stat-card:hover { box-shadow: var(--shadow-md); }
+  .stat-label { font-size: 12px; color: var(--mi-gray); margin-bottom: 8px; font-weight: 500; }
+  .stat-value { font-size: 28px; font-weight: 700; color: var(--mi-black); line-height: 1; }
+  .stat-value.orange { color: var(--mi-orange); }
+  .stat-unit { font-size: 14px; font-weight: 400; color: var(--mi-gray); }
+  .stat-change { font-size: 12px; margin-top: 8px; display: flex; align-items: center; gap: 4px; }
+  .stat-change.up { color: #2e7d32; }
+  .stat-change.down { color: #c62828; }
+  .stat-icon {
+    position: absolute; right: 16px; top: 16px;
+    font-size: 32px; opacity: 0.12;
+  }
+
+  /* Grid layouts */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+
+  /* Table */
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; }
+  th {
+    background: #FAFAFA; padding: 11px 14px;
+    text-align: left; font-size: 12px; color: var(--mi-gray);
+    font-weight: 600; border-bottom: 1px solid var(--mi-border);
+    white-space: nowrap;
+  }
+  td {
+    padding: 12px 14px; font-size: 13px;
+    border-bottom: 1px solid var(--mi-border);
+    color: var(--mi-black);
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: #FAFAFA; }
+
+  /* Tags */
+  .tag {
+    display: inline-flex; align-items: center;
+    padding: 2px 10px; border-radius: 20px; font-size: 12px; font-weight: 500;
+  }
+  .tag-green { background: #E8F5E9; color: #2e7d32; }
+  .tag-red { background: #FFEBEE; color: #c62828; }
+  .tag-orange { background: #FFF3E0; color: #E65100; }
+  .tag-blue { background: #E3F2FD; color: #1565C0; }
+  .tag-gray { background: #F5F5F5; color: #757575; }
+
+  /* Search bar */
+  .toolbar { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
+  .search-wrap { position: relative; }
+  .search-wrap input {
+    height: 36px; width: 240px;
+    border: 1.5px solid var(--mi-border);
+    border-radius: var(--radius);
+    padding: 0 12px 0 34px;
+    font-size: 13px; outline: none;
+    transition: border-color 0.2s; font-family: inherit;
+  }
+  .search-wrap input:focus { border-color: var(--mi-orange); }
+  .search-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); font-size: 14px; color: #ccc; }
+  .select-filter {
+    height: 36px; padding: 0 10px;
+    border: 1.5px solid var(--mi-border);
+    border-radius: var(--radius); font-size: 13px;
+    background: #fff; outline: none; cursor: pointer;
+    font-family: inherit; color: var(--mi-gray-dark);
+    transition: border-color 0.2s;
+  }
+  .select-filter:focus { border-color: var(--mi-orange); }
+
+  /* Pagination */
+  .pagination { display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; border-top: 1px solid var(--mi-border); }
+  .page-info { font-size: 12px; color: var(--mi-gray); }
+  .page-btns { display: flex; gap: 4px; }
+  .page-btn {
+    width: 30px; height: 30px; border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; cursor: pointer; border: 1.5px solid var(--mi-border);
+    background: #fff; color: var(--mi-gray-dark); transition: all 0.2s;
+  }
+  .page-btn:hover { border-color: var(--mi-orange); color: var(--mi-orange); }
+  .page-btn.active { background: var(--mi-orange); border-color: var(--mi-orange); color: #fff; }
+
+  /* Chart placeholder */
+  .chart-placeholder {
+    height: 200px; background: linear-gradient(180deg, #FFF3E0 0%, #fff 100%);
+    border-radius: var(--radius); display: flex; align-items: flex-end;
+    gap: 8px; padding: 16px; position: relative; overflow: hidden;
+  }
+  .chart-bar {
+    flex: 1; background: linear-gradient(180deg, var(--mi-orange) 0%, #FFB74D 100%);
+    border-radius: 4px 4px 0 0; transition: opacity 0.2s;
+    cursor: pointer; position: relative;
+  }
+  .chart-bar:hover { opacity: 0.85; }
+  .chart-bar-label { position: absolute; bottom: -18px; left: 50%; transform: translateX(-50%); font-size: 11px; color: var(--mi-gray); white-space: nowrap; }
+
+  /* Modal */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.35); z-index: 100;
+    align-items: center; justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: #fff; border-radius: 12px;
+    padding: 28px; width: 480px; max-width: 90vw;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+    animation: modalIn 0.25s ease;
+  }
+  @keyframes modalIn { from { opacity: 0; transform: scale(0.94) translateY(10px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+  .modal-title { font-size: 16px; font-weight: 700; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
+  .modal-close { cursor: pointer; font-size: 20px; color: var(--mi-gray-light); line-height: 1; }
+  .modal-close:hover { color: var(--mi-black); }
+  .modal-form .form-group { margin-bottom: 16px; }
+  .modal-form label { display: block; font-size: 12px; color: var(--mi-gray); margin-bottom: 5px; font-weight: 500; }
+  .modal-form input, .modal-form select, .modal-form textarea {
+    width: 100%; height: 38px;
+    border: 1.5px solid var(--mi-border);
+    border-radius: var(--radius); padding: 0 12px;
+    font-size: 13px; outline: none; font-family: inherit;
+    transition: border-color 0.2s;
+  }
+  .modal-form input:focus, .modal-form select:focus { border-color: var(--mi-orange); }
+  .modal-form textarea { height: 72px; padding: 8px 12px; resize: none; }
+  .modal-form .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .modal-footer { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
+
+  /* Alert Banner */
+  .alert-banner {
+    display: flex; align-items: center; gap: 10px;
+    background: #FFF3E0; border: 1px solid #FFCC80;
+    border-radius: var(--radius); padding: 10px 16px;
+    margin-bottom: 16px; font-size: 13px; color: #E65100;
+  }
+
+  /* Progress bar */
+  .progress { height: 6px; background: var(--mi-border); border-radius: 3px; overflow: hidden; }
+  .progress-fill { height: 100%; background: var(--mi-orange); border-radius: 3px; transition: width 0.3s; }
+
+  /* ── DASHBOARD ── */
+  .dashboard-charts { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; margin-top: 16px; }
+  .chart-card { background: #fff; border-radius: var(--radius); border: 1px solid var(--mi-border); padding: 20px; box-shadow: var(--shadow-sm); }
+  .chart-title { font-size: 14px; font-weight: 600; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; }
+  .chart-legend { display: flex; gap: 12px; }
+  .legend-item { display: flex; align-items: center; gap: 5px; font-size: 12px; color: var(--mi-gray); }
+  .legend-dot { width: 8px; height: 8px; border-radius: 50%; }
+  .donut-chart { width: 140px; height: 140px; margin: 0 auto; position: relative; }
+  .donut-chart svg { width: 100%; height: 100%; }
+  .donut-center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .donut-center-val { font-size: 22px; font-weight: 700; color: var(--mi-black); }
+  .donut-center-label { font-size: 11px; color: var(--mi-gray); }
+  .category-list { margin-top: 16px; }
+  .category-item { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+  .category-name { flex: 1; font-size: 13px; }
+  .category-pct { font-size: 12px; color: var(--mi-gray); width: 32px; text-align: right; }
+
+  /* Recent orders mini table */
+  .recent-order-row { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--mi-border); }
+  .recent-order-row:last-child { border-bottom: none; }
+  .order-no { font-size: 12px; color: var(--mi-gray); flex: 1; }
+  .order-amt { font-size: 14px; font-weight: 600; color: var(--mi-orange); }
+
+  /* Inventory warning */
+  .inv-warning { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--mi-border); }
+  .inv-warning:last-child { border-bottom: none; }
+  .inv-name { flex: 1; font-size: 13px; }
+  .inv-stock { font-size: 13px; font-weight: 600; color: #c62828; }
+
+  /* Member level badge */
+  .level-badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: 600;
+  }
+  .level-1 { background: #F5F5F5; color: #757575; }
+  .level-2 { background: #E3F2FD; color: #1565C0; }
+  .level-3 { background: #FFF3E0; color: #E65100; }
+  .level-4 { background: linear-gradient(135deg, #FFF3E0, #FFCC80); color: #BF360C; }
+
+  /* Tabs */
+  .tabs { display: flex; gap: 0; border-bottom: 2px solid var(--mi-border); margin-bottom: 20px; }
+  .tab {
+    padding: 10px 20px; font-size: 14px; color: var(--mi-gray);
+    cursor: pointer; font-weight: 500; transition: all 0.2s;
+    border-bottom: 2px solid transparent; margin-bottom: -2px;
+  }
+  .tab:hover { color: var(--mi-black); }
+  .tab.active { color: var(--mi-orange); border-bottom-color: var(--mi-orange); }
+
+  /* Stats chart area */
+  .line-chart-wrap { height: 220px; position: relative; padding-bottom: 24px; }
+  .line-chart-grid { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: space-between; }
+  .grid-line { border-top: 1px dashed var(--mi-border); }
+  .line-chart-bars { position: absolute; bottom: 24px; left: 0; right: 0; top: 0; display: flex; align-items: flex-end; gap: 6px; }
+  .trend-bar {
+    flex: 1; border-radius: 3px 3px 0 0;
+    background: linear-gradient(180deg, rgba(255,105,0,0.85), rgba(255,183,77,0.6));
+    cursor: pointer; transition: opacity 0.15s;
+    position: relative;
+  }
+  .trend-bar:hover { opacity: 0.8; }
+  .trend-bar.highlight { background: linear-gradient(180deg, var(--mi-orange), #FF8C38); }
+  .line-chart-labels { display: flex; gap: 6px; position: absolute; bottom: 0; left: 0; right: 0; }
+  .line-chart-labels span { flex: 1; text-align: center; font-size: 11px; color: var(--mi-gray); }
+
+  /* System config */
+  .config-section { margin-bottom: 24px; }
+  .config-section-title { font-size: 14px; font-weight: 600; margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid var(--mi-border); display: flex; align-items: center; gap: 8px; }
+  .config-row { display: flex; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--mi-border); }
+  .config-row:last-child { border-bottom: none; }
+  .config-label { flex: 1; }
+  .config-name { font-size: 13px; font-weight: 500; }
+  .config-desc { font-size: 12px; color: var(--mi-gray); margin-top: 2px; }
+  .toggle {
+    width: 44px; height: 24px; border-radius: 12px;
+    background: #E0E0E0; cursor: pointer; position: relative;
+    transition: background 0.2s;
+  }
+  .toggle.on { background: var(--mi-orange); }
+  .toggle::after {
+    content: ''; position: absolute;
+    width: 18px; height: 18px; border-radius: 50%;
+    background: #fff; top: 3px; left: 3px;
+    transition: left 0.2s;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+  }
+  .toggle.on::after { left: 23px; }
+
+  /* Scrollbar global */
+  ::-webkit-scrollbar { width: 4px; height: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: #DDD; border-radius: 2px; }
+</style>
+</head>
+<body>
+
+<!-- ══════════════ LOGIN PAGE ══════════════ -->
+<div id="page-login">
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="mi-icon">mi</div>
+      <div>
+        <span>小米之家</span><br>
+        <small>门店管理系统</small>
+      </div>
+    </div>
+    <div class="login-title">欢迎回来</div>
+    <div class="login-sub">请登录您的管理员账户</div>
+    <div class="form-group">
+      <label>用户名</label>
+      <input type="text" placeholder="请输入用户名" id="login-user" value="admin">
+    </div>
+    <div class="form-group">
+      <label>密码</label>
+      <input type="password" placeholder="请输入密码" id="login-pass" value="••••••••">
+    </div>
+    <button class="btn-login" onclick="doLogin()">登 录</button>
+    <div class="login-hint">演示账号：admin / <span>点击直接登录</span></div>
+  </div>
+</div>
+
+<!-- ══════════════ APP SHELL ══════════════ -->
+<div id="app">
+  <!-- Header -->
+  <div class="app-header">
+    <div class="header-brand">
+      <div class="mi-icon">mi</div>
+      <div>
+        <div class="brand-text">小米之家</div>
+        <div class="brand-sub">门店管理系统</div>
+      </div>
+    </div>
+    <div class="header-main">
+      <div class="breadcrumb">首页 / <span id="breadcrumb-current">数据概览</span></div>
+    </div>
+    <div class="header-actions">
+      <div class="header-badge">
+        <span class="header-icon">🔔</span>
+        <div class="badge-dot"></div>
+      </div>
+      <div class="header-user" onclick="doLogout()">
+        <div class="avatar">管</div>
+        <div>
+          <div class="header-user-name">管理员</div>
+          <div class="header-user-role">超级管理员</div>
+        </div>
+        <span style="font-size:12px;color:#ccc;margin-left:4px">▾</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="app-body">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div class="nav-section">
+        <div class="nav-section-title">工作台</div>
+        <div class="nav-item active" onclick="switchPage('dashboard', this, '数据概览')">
+          <span class="nav-icon">📊</span> 数据概览
+        </div>
+      </div>
+      <div class="nav-section">
+        <div class="nav-section-title">业务管理</div>
+        <div class="nav-item" onclick="switchPage('product', this, '商品管理')">
+          <span class="nav-icon">📦</span> 商品管理
+        </div>
+        <div class="nav-item" onclick="switchPage('inventory', this, '库存管理')">
+          <span class="nav-icon">🏪</span> 库存管理
+          <span class="nav-badge">3</span>
+        </div>
+        <div class="nav-item" onclick="switchPage('order', this, '订单管理')">
+          <span class="nav-icon">🧾</span> 订单管理
+        </div>
+        <div class="nav-item" onclick="switchPage('member', this, '会员管理')">
+          <span class="nav-icon">👤</span> 会员管理
+        </div>
+      </div>
+      <div class="nav-section">
+        <div class="nav-section-title">数据分析</div>
+        <div class="nav-item" onclick="switchPage('stats', this, '统计分析')">
+          <span class="nav-icon">📈</span> 统计分析
+        </div>
+      </div>
+      <div class="nav-section">
+        <div class="nav-section-title">系统</div>
+        <div class="nav-item" onclick="switchPage('system', this, '系统配置')">
+          <span class="nav-icon">⚙️</span> 系统配置
+        </div>
+      </div>
+    </div>
+
+    <!-- Content -->
+    <div class="content">
+
+      <!-- ── DASHBOARD ── -->
+      <div class="page active" id="page-dashboard">
+        <div class="page-header">
+          <div>
+            <div class="page-title">数据概览</div>
+            <div class="page-sub">今日实时数据 · 2025-12-22</div>
+          </div>
+          <div style="display:flex;gap:10px">
+            <select class="select-filter">
+              <option>今日</option><option>本周</option><option>本月</option>
+            </select>
+            <button class="btn btn-outline">📥 导出报表</button>
+          </div>
+        </div>
+
+        <div class="stat-grid">
+          <div class="stat-card">
+            <div class="stat-label">今日销售额</div>
+            <div class="stat-value orange">¥ 38,420</div>
+            <div class="stat-change up">↑ 12.5% 较昨日</div>
+            <div class="stat-icon">💰</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">今日订单数</div>
+            <div class="stat-value">128 <span class="stat-unit">单</span></div>
+            <div class="stat-change up">↑ 8.3% 较昨日</div>
+            <div class="stat-icon">🧾</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">在售商品</div>
+            <div class="stat-value">342 <span class="stat-unit">件</span></div>
+            <div class="stat-change down">↓ 2 件预警</div>
+            <div class="stat-icon">📦</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">会员总数</div>
+            <div class="stat-value">5,841 <span class="stat-unit">人</span></div>
+            <div class="stat-change up">↑ 今日新增 23</div>
+            <div class="stat-icon">👥</div>
+          </div>
+        </div>
+
+        <div class="dashboard-charts">
+          <div class="chart-card">
+            <div class="chart-title">
+              近7日销售趋势
+              <div class="chart-legend">
+                <div class="legend-item"><div class="legend-dot" style="background:var(--mi-orange)"></div>销售额</div>
+                <div class="legend-item"><div class="legend-dot" style="background:#64B5F6"></div>订单量</div>
+              </div>
+            </div>
+            <div class="line-chart-wrap">
+              <div class="line-chart-grid">
+                <div class="grid-line"></div><div class="grid-line"></div>
+                <div class="grid-line"></div><div class="grid-line"></div>
+              </div>
+              <div class="line-chart-bars">
+                <div class="trend-bar" style="height:55%"></div>
+                <div class="trend-bar" style="height:70%"></div>
+                <div class="trend-bar" style="height:48%"></div>
+                <div class="trend-bar" style="height:82%"></div>
+                <div class="trend-bar" style="height:63%"></div>
+                <div class="trend-bar" style="height:90%"></div>
+                <div class="trend-bar highlight" style="height:75%"></div>
+              </div>
+              <div class="line-chart-labels">
+                <span>12/16</span><span>12/17</span><span>12/18</span><span>12/19</span>
+                <span>12/20</span><span>12/21</span><span>今日</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="chart-card">
+            <div class="chart-title">商品分类占比</div>
+            <div class="donut-chart">
+              <svg viewBox="0 0 36 36">
+                <circle cx="18" cy="18" r="14" fill="none" stroke="#F5F5F5" stroke-width="5"/>
+                <circle cx="18" cy="18" r="14" fill="none" stroke="#FF6900" stroke-width="5"
+                  stroke-dasharray="40 60" stroke-dashoffset="25" stroke-linecap="round"/>
+                <circle cx="18" cy="18" r="14" fill="none" stroke="#64B5F6" stroke-width="5"
+                  stroke-dasharray="25 75" stroke-dashoffset="-15" stroke-linecap="round"/>
+                <circle cx="18" cy="18" r="14" fill="none" stroke="#81C784" stroke-width="5"
+                  stroke-dasharray="20 80" stroke-dashoffset="-40" stroke-linecap="round"/>
+                <circle cx="18" cy="18" r="14" fill="none" stroke="#FFD54F" stroke-width="5"
+                  stroke-dasharray="15 85" stroke-dashoffset="-60" stroke-linecap="round"/>
+              </svg>
+              <div class="donut-center">
+                <div class="donut-center-val">342</div>
+                <div class="donut-center-label">总商品</div>
+              </div>
+            </div>
+            <div class="category-list">
+              <div class="category-item">
+                <div class="legend-dot" style="background:#FF6900;width:10px;height:10px;border-radius:2px;flex-shrink:0"></div>
+                <div class="category-name">手机数码</div>
+                <div class="progress" style="width:80px"><div class="progress-fill" style="width:40%"></div></div>
+                <div class="category-pct">40%</div>
+              </div>
+              <div class="category-item">
+                <div class="legend-dot" style="background:#64B5F6;width:10px;height:10px;border-radius:2px;flex-shrink:0"></div>
+                <div class="category-name">智能家居</div>
+                <div class="progress" style="width:80px"><div class="progress-fill" style="width:25%;background:#64B5F6"></div></div>
+                <div class="category-pct">25%</div>
+              </div>
+              <div class="category-item">
+                <div class="legend-dot" style="background:#81C784;width:10px;height:10px;border-radius:2px;flex-shrink:0"></div>
+                <div class="category-name">穿戴设备</div>
+                <div class="progress" style="width:80px"><div class="progress-fill" style="width:20%;background:#81C784"></div></div>
+                <div class="category-pct">20%</div>
+              </div>
+              <div class="category-item">
+                <div class="legend-dot" style="background:#FFD54F;width:10px;height:10px;border-radius:2px;flex-shrink:0"></div>
+                <div class="category-name">配件周边</div>
+                <div class="progress" style="width:80px"><div class="progress-fill" style="width:15%;background:#FFD54F"></div></div>
+                <div class="category-pct">15%</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid-2" style="margin-top:16px">
+          <div class="chart-card">
+            <div class="chart-title">最新订单</div>
+            <div class="recent-order-row">
+              <div>
+                <div style="font-size:13px;font-weight:500">ORD202512220028</div>
+                <div class="order-no">小米15 Pro × 1</div>
+              </div>
+              <span class="tag tag-orange">待支付</span>
+              <div class="order-amt">¥5,999</div>
+            </div>
+            <div class="recent-order-row">
+              <div>
+                <div style="font-size:13px;font-weight:500">ORD202512220027</div>
+                <div class="order-no">Redmi K80 × 2</div>
+              </div>
+              <span class="tag tag-green">已支付</span>
+              <div class="order-amt">¥3,998</div>
+            </div>
+            <div class="recent-order-row">
+              <div>
+                <div style="font-size:13px;font-weight:500">ORD202512220026</div>
+                <div class="order-no">小米手环9 × 3</div>
+              </div>
+              <span class="tag tag-green">已支付</span>
+              <div class="order-amt">¥747</div>
+            </div>
+            <div class="recent-order-row">
+              <div>
+                <div style="font-size:13px;font-weight:500">ORD202512220025</div>
+                <div class="order-no">小米平板7 × 1</div>
+              </div>
+              <span class="tag tag-gray">已取消</span>
+              <div class="order-amt">¥2,499</div>
+            </div>
+          </div>
+          <div class="chart-card">
+            <div class="chart-title">库存预警 <span class="tag tag-red" style="font-size:11px">3 件</span></div>
+            <div class="inv-warning">
+              <span style="font-size:20px">⚠️</span>
+              <div class="inv-name">小米15 Ultra<div style="font-size:11px;color:#999">SKU: MI15U-512</div></div>
+              <div>
+                <div class="inv-stock">剩余 5</div>
+                <div style="font-size:11px;color:#999">预警值 10</div>
+              </div>
+            </div>
+            <div class="inv-warning">
+              <span style="font-size:20px">⚠️</span>
+              <div class="inv-name">Redmi Buds 6<div style="font-size:11px;color:#999">SKU: RB6-WHT</div></div>
+              <div>
+                <div class="inv-stock">剩余 8</div>
+                <div style="font-size:11px;color:#999">预警值 15</div>
+              </div>
+            </div>
+            <div class="inv-warning">
+              <span style="font-size:20px">⚠️</span>
+              <div class="inv-name">小米手表S4<div style="font-size:11px;color:#999">SKU: MWS4-BLK</div></div>
+              <div>
+                <div class="inv-stock">剩余 3</div>
+                <div style="font-size:11px;color:#999">预警值 10</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── PRODUCT ── -->
+      <div class="page" id="page-product">
+        <div class="page-header">
+          <div>
+            <div class="page-title">商品管理</div>
+            <div class="page-sub">共 342 件商品，其中 320 件上架中</div>
+          </div>
+          <button class="btn btn-primary" onclick="openModal('modal-product')">＋ 新增商品</button>
+        </div>
+        <div class="card">
+          <div class="card-body" style="padding-bottom:8px">
+            <div class="toolbar">
+              <div class="search-wrap">
+                <span class="search-icon">🔍</span>
+                <input type="text" placeholder="搜索商品名称 / 编码">
+              </div>
+              <select class="select-filter"><option>全部分类</option><option>手机数码</option><option>智能家居</option><option>穿戴设备</option><option>配件周边</option></select>
+              <select class="select-filter"><option>全部状态</option><option>上架</option><option>下架</option></select>
+              <button class="btn btn-outline btn-sm">🔍 筛选</button>
+              <button class="btn btn-outline btn-sm" style="margin-left:auto">📥 导出</button>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th><input type="checkbox"></th>
+                  <th>商品编码</th>
+                  <th>商品名称</th>
+                  <th>分类</th>
+                  <th>售价</th>
+                  <th>库存</th>
+                  <th>状态</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><input type="checkbox"></td>
+                  <td style="color:var(--mi-gray);font-size:12px">PROD2025120001</td>
+                  <td><div style="font-weight:500">小米15 Pro</div><div style="font-size:12px;color:#999">256GB / 钛金黑</div></td>
+                  <td>手机数码</td>
+                  <td style="font-weight:600;color:var(--mi-orange)">¥4,999</td>
+                  <td>87</td>
+                  <td><span class="tag tag-green">上架</span></td>
+                  <td><div style="display:flex;gap:6px">
+                    <button class="btn btn-outline btn-sm" onclick="openModal('modal-product')">编辑</button>
+                    <button class="btn btn-danger btn-sm">下架</button>
+                  </div></td>
+                </tr>
+                <tr>
+                  <td><input type="checkbox"></td>
+                  <td style="color:var(--mi-gray);font-size:12px">PROD2025120002</td>
+                  <td><div style="font-weight:500">Redmi K80 Pro</div><div style="font-size:12px;color:#999">512GB / 幽灵白</div></td>
+                  <td>手机数码</td>
+                  <td style="font-weight:600;color:var(--mi-orange)">¥2,699</td>
+                  <td>142</td>
+                  <td><span class="tag tag-green">上架</span></td>
+                  <td><div style="display:flex;gap:6px">
+                    <button class="btn btn-outline btn-sm" onclick="openModal('modal-product')">编辑</button>
+                    <button class="btn btn-danger btn-sm">下架</button>
+                  </div></td>
+                </tr>
+                <tr>
+                  <td><input type="checkbox"></td>
+                  <td style="color:var(--mi-gray);font-size:12px">PROD2025120003</td>
+                  <td><div style="font-weight:500">小米手环9 Pro</div><div style="font-size:12px;color:#999">标准版 / 曜石黑</div></td>
+                  <td>穿戴设备</td>
+                  <td style="font-weight:600;color:var(--mi-orange)">¥299</td>
+                  <td style="color:#c62828;font-weight:600">5 ⚠️</td>
+                  <td><span class="tag tag-green">上架</span></td>
+                  <td><div style="display:flex;gap:6px">
+                    <button class="btn btn-outline btn-sm" onclick="openModal('modal-product')">编辑</button>
+                    <button class="btn btn-danger btn-sm">下架</button>
+                  </div></td>
+                </tr>
+                <tr>
+                  <td><input type="checkbox"></td>
+                  <td style="color:var(--mi-gray);font-size:12px">PROD2025120004</td>
+                  <td><div style="font-weight:500">小米智能家居套装</div><div style="font-size:12px;color:#999">基础版</div></td>
+                  <td>智能家居</td>
+                  <td style="font-weight:600;color:var(--mi-orange)">¥899</td>
+                  <td>31</td>
+                  <td><span class="tag tag-red">下架</span></td>
+                  <td><div style="display:flex;gap:6px">
+                    <button class="btn btn-outline btn-sm" onclick="openModal('modal-product')">编辑</button>
+                    <button class="btn btn-primary btn-sm">上架</button>
+                  </div></td>
+                </tr>
+                <tr>
+                  <td><input type="checkbox"></td>
+                  <td style="color:var(--mi-gray);font-size:12px">PROD2025120005</td>
+                  <td><div style="font-weight:500">小米平板7 Pro</div><div style="font-size:12px;color:#999">12GB+256GB</div></td>
+                  <td>手机数码</td>
+                  <td style="font-weight:600;color:var(--mi-orange)">¥3,299</td>
+                  <td>58</td>
+                  <td><span class="tag tag-green">上架</span></td>
+                  <td><div style="display:flex;gap:6px">
+                    <button class="btn btn-outline btn-sm" onclick="openModal('modal-product')">编辑</button>
+                    <button class="btn btn-danger btn-sm">下架</button>
+                  </div></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="pagination">
+            <div class="page-info">共 342 条，每页 10 条</div>
+            <div class="page-btns">
+              <div class="page-btn">‹</div>
+              <div class="page-btn active">1</div>
+              <div class="page-btn">2</div>
+              <div class="page-btn">3</div>
+              <div class="page-btn">…</div>
+              <div class="page-btn">35</div>
+              <div class="page-btn">›</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── INVENTORY ── -->
+      <div class="page" id="page-inventory">
+        <div class="page-header">
+          <div>
+            <div class="page-title">库存管理</div>
+            <div class="page-sub">3 件商品库存低于预警值</div>
+          </div>
+          <div style="display:flex;gap:10px">
+            <button class="btn btn-outline" onclick="openModal('modal-inout')">📥 入库</button>
+            <button class="btn btn-primary" onclick="openModal('modal-inout')">📤 出库</button>
+          </div>
+        </div>
+
+        <div class="alert-banner">
+          ⚠️ <strong>库存预警：</strong>小米15 Ultra、Redmi Buds 6、小米手表S4 库存不足，请及时补货
+        </div>
+
+        <div class="card">
+          <div class="card-body" style="padding-bottom:8px">
+            <div class="toolbar">
+              <div class="search-wrap">
+                <span class="search-icon">🔍</span>
+                <input type="text" placeholder="搜索商品名称">
+              </div>
+              <select class="select-filter"><option>全部类型</option><option>入库</option><option>出库</option></select>
+              <select class="select-filter"><option>全部状态</option><option>正常</option><option>预警</option></select>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>商品名称</th><th>SKU编码</th><th>当前库存</th>
+                  <th>预警值</th><th>最近入库</th><th>状态</th><th>操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><div style="font-weight:500">小米15 Ultra</div></td>
+                  <td style="font-size:12px;color:#999">MI15U-512</td>
+                  <td style="font-weight:700;color:#c62828">5</td>
+                  <td>10</td>
+                  <td style="font-size:12px;color:#999">2025-12-20</td>
+                  <td><span class="tag tag-red">预警</span></td>
+                  <td><button class="btn btn-primary btn-sm" onclick="openModal('modal-inout')">立即补货</button></td>
+                </tr>
+                <tr>
+                  <td><div style="font-weight:500">Redmi Buds 6</div></td>
+                  <td style="font-size:12px;color:#999">RB6-WHT</td>
+                  <td style="font-weight:700;color:#c62828">8</td>
+                  <td>15</td>
+                  <td style="font-size:12px;color:#999">2025-12-18</td>
+                  <td><span class="tag tag-red">预警</span></td>
+                  <td><button class="btn btn-primary btn-sm" onclick="openModal('modal-inout')">立即补货</button></td>
+                </tr>
+                <tr>
+                  <td><div style="font-weight:500">小米手表S4</div></td>
+                  <td style="font-size:12px;color:#999">MWS4-BLK</td>
+                  <td style="font-weight:700;color:#c62828">3</td>
+                  <td>10</td>
+                  <td style="font-size:12px;color:#999">2025-12-15</td>
+                  <td><span class="tag tag-red">预警</span></td>
+                  <td><button class="btn btn-primary btn-sm" onclick="openModal('modal-inout')">立即补货</button></td>
+                </tr>
+                <tr>
+                  <td><div style="font-weight:500">小米15 Pro</div></td>
+                  <td style="font-size:12px;color:#999">MI15P-256</td>
+                  <td style="font-weight:700">87</td>
+                  <td>20</td>
+                  <td style="font-size:12px;color:#999">2025-12-22</td>
+                  <td><span class="tag tag-green">正常</span></td>
+                  <td><div style="display:flex;gap:6px">
+                    <button class="btn btn-outline btn-sm" onclick="openModal('modal-inout')">调整</button>
+                  </div></td>
+                </tr>
+                <tr>
+                  <td><div style="font-weight:500">Redmi K80 Pro</div></td>
+                  <td style="font-size:12px;color:#999">RK80-512</td>
+                  <td style="font-weight:700">142</td>
+                  <td>20</td>
+                  <td style="font-size:12px;color:#999">2025-12-21</td>
+                  <td><span class="tag tag-green">正常</span></td>
+                  <td><div style="display:flex;gap:6px">
+                    <button class="btn btn-outline btn-sm" onclick="openModal('modal-inout')">调整</button>
+                  </div></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="pagination">
+            <div class="page-info">共 342 条，每页 10 条</div>
+            <div class="page-btns">
+              <div class="page-btn">‹</div>
+              <div class="page-btn active">1</div>
+              <div class="page-btn">2</div>
+              <div class="page-btn">3</div>
+              <div class="page-btn">›</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── ORDER ── -->
+      <div class="page" id="page-order">
+        <div class="page-header">
+          <div>
+            <div class="page-title">订单管理</div>
+            <div class="page-sub">今日共 128 笔订单</div>
+          </div>
+          <button class="btn btn-primary" onclick="openModal('modal-order')">＋ 创建订单</button>
+        </div>
+        <div class="card">
+          <div class="card-body" style="padding-bottom:8px">
+            <div class="toolbar">
+              <div class="search-wrap">
+                <span class="search-icon">🔍</span>
+                <input type="text" placeholder="搜索订单号">
+              </div>
+              <select class="select-filter"><option>全部状态</option><option>待支付</option><option>已支付</option><option>已取消</option></select>
+              <input type="date" class="select-filter" value="2025-12-22">
+              <button class="btn btn-outline btn-sm">🔍 查询</button>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>订单号</th><th>会员</th><th>商品</th>
+                  <th>金额</th><th>支付方式</th><th>状态</th><th>下单时间</th><th>操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="font-family:monospace;font-size:12px">ORD202512220028</td>
+                  <td><div style="font-size:13px">张三 <span class="level-badge level-3">金</span></div><div style="font-size:11px;color:#999">138****0001</div></td>
+                  <td><div>小米15 Pro × 1</div><div style="font-size:11px;color:#999">+2件...</div></td>
+                  <td style="font-weight:700;color:var(--mi-orange)">¥5,999</td>
+                  <td>—</td>
+                  <td><span class="tag tag-orange">待支付</span></td>
+                  <td style="font-size:12px;color:#999">14:32:18</td>
+                  <td><div style="display:flex;gap:6px">
+                    <button class="btn btn-primary btn-sm">收款</button>
+                    <button class="btn btn-outline btn-sm">详情</button>
+                  </div></td>
+                </tr>
+                <tr>
+                  <td style="font-family:monospace;font-size:12px">ORD202512220027</td>
+                  <td><div style="font-size:13px">李四 <span class="level-badge level-2">银</span></div><div style="font-size:11px;color:#999">138****0002</div></td>
+                  <td><div>Redmi K80 × 2</div></td>
+                  <td style="font-weight:700;color:var(--mi-orange)">¥3,998</td>
+                  <td><span class="tag tag-blue">微信支付</span></td>
+                  <td><span class="tag tag-green">已支付</span></td>
+                  <td style="font-size:12px;color:#999">14:18:05</td>
+                  <td><div style="display:flex;gap:6px">
+                    <button class="btn btn-outline btn-sm">详情</button>
+                    <button class="btn btn-danger btn-sm">退款</button>
+                  </div></td>
+                </tr>
+                <tr>
+                  <td style="font-family:monospace;font-size:12px">ORD202512220026</td>
+                  <td><div style="font-size:13px">散客</div><div style="font-size:11px;color:#999">—</div></td>
+                  <td><div>小米手环9 × 3</div></td>
+                  <td style="font-weight:700;color:var(--mi-orange)">¥747</td>
+                  <td><span class="tag tag-orange" style="background:#FFF3E0;color:#E65100">支付宝</span></td>
+                  <td><span class="tag tag-green">已支付</span></td>
+                  <td style="font-size:12px;color:#999">13:55:41</td>
+                  <td><div style="display:flex;gap:6px">
+                    <button class="btn btn-outline btn-sm">详情</button>
+                    <button class="btn btn-danger btn-sm">退款</button>
+                  </div></td>
+                </tr>
+                <tr>
+                  <td style="font-family:monospace;font-size:12px">ORD202512220025</td>
+                  <td><div style="font-size:13px">王五 <span class="level-badge level-1">普通</span></div><div style="font-size:11px;color:#999">138****0003</div></td>
+                  <td><div>小米平板7 × 1</div></td>
+                  <td style="font-weight:700;color:#999">¥2,499</td>
+                  <td>—</td>
+                  <td><span class="tag tag-gray">已取消</span></td>
+                  <td style="font-size:12px;color:#999">13:22:09</td>
+                  <td><div style="display:flex;gap:6px">
+                    <button class="btn btn-outline btn-sm">详情</button>
+                  </div></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="pagination">
+            <div class="page-info">共 128 条，每页 10 条</div>
+            <div class="page-btns">
+              <div class="page-btn">‹</div>
+              <div class="page-btn active">1</div>
+              <div class="page-btn">2</div>
+              <div class="page-btn">3</div>
+              <div class="page-btn">…</div>
+              <div class="page-btn">13</div>
+              <div class="page-btn">›</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── MEMBER ── -->
+      <div class="page" id="page-member">
+        <div class="page-header">
+          <div>
+            <div class="page-title">会员管理</div>
+            <div class="page-sub">共 5,841 名会员</div>
+          </div>
+          <button class="btn btn-primary" onclick="openModal('modal-member')">＋ 新增会员</button>
+        </div>
+        <div class="card">
+          <div class="card-body" style="padding-bottom:8px">
+            <div class="toolbar">
+              <div class="search-wrap">
+                <span class="search-icon">🔍</span>
+                <input type="text" placeholder="手机号 / 姓名 / 会员卡号">
+              </div>
+              <select class="select-filter"><option>全部等级</option><option>普通会员</option><option>银卡会员</option><option>金卡会员</option><option>钻石会员</option></select>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>会员卡号</th><th>姓名</th><th>手机号</th><th>等级</th>
+                  <th>积分</th><th>累计消费</th><th>注册时间</th><th>操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="font-family:monospace;font-size:12px">MCN0001</td>
+                  <td style="font-weight:500">张三</td>
+                  <td style="color:#999">138****0001</td>
+                  <td><span class="level-badge level-3">🥇 金卡</span></td>
+                  <td style="color:var(--mi-orange);font-weight:600">8,420</td>
+                  <td style="font-weight:600">¥42,100</td>
+                  <td style="color:#999;font-size:12px">2024-03-15</td>
+                  <td><div style="display:flex;gap:6px">
+                    <button class="btn btn-outline btn-sm">详情</button>
+                    <button class="btn btn-outline btn-sm">积分</button>
+                  </div></td>
+                </tr>
+                <tr>
+                  <td style="font-family:monospace;font-size:12px">MCN0002</td>
+                  <td style="font-weight:500">李四</td>
+                  <td style="color:#999">138****0002</td>
+                  <td><span class="level-badge level-2">🥈 银卡</span></td>
+                  <td style="color:var(--mi-orange);font-weight:600">3,200</td>
+                  <td style="font-weight:600">¥16,000</td>
+                  <td style="color:#999;font-size:12px">2024-07-20</td>
+                  <td><div style="display:flex;gap:6px">
+                    <button class="btn btn-outline btn-sm">详情</button>
+                    <button class="btn btn-outline btn-sm">积分</button>
+                  </div></td>
+                </tr>
+                <tr>
+                  <td style="font-family:monospace;font-size:12px">MCN0003</td>
+                  <td style="font-weight:500">王五</td>
+                  <td style="color:#999">138****0003</td>
+                  <td><span class="level-badge level-1">普通</span></td>
+                  <td style="color:var(--mi-orange);font-weight:600">450</td>
+                  <td style="font-weight:600">¥2,250</td>
+                  <td style="color:#999;font-size:12px">2025-01-08</td>
+                  <td><div style="display:flex;gap:6px">
+                    <button class="btn btn-outline btn-sm">详情</button>
+                    <button class="btn btn-outline btn-sm">积分</button>
+                  </div></td>
+                </tr>
+                <tr>
+                  <td style="font-family:monospace;font-size:12px">MCN0004</td>
+                  <td style="font-weight:500">赵六</td>
+                  <td style="color:#999">138****0004</td>
+                  <td><span class="level-badge level-4">💎 钻石</span></td>
+                  <td style="color:var(--mi-orange);font-weight:600">26,800</td>
+                  <td style="font-weight:600">¥134,000</td>
+                  <td style="color:#999;font-size:12px">2023-11-02</td>
+                  <td><div style="display:flex;gap:6px">
+                    <button class="btn btn-outline btn-sm">详情</button>
+                    <button class="btn btn-outline btn-sm">积分</button>
+                  </div></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="pagination">
+            <div class="page-info">共 5,841 条，每页 10 条</div>
+            <div class="page-btns">
+              <div class="page-btn">‹</div>
+              <div class="page-btn active">1</div>
+              <div class="page-btn">2</div>
+              <div class="page-btn">3</div>
+              <div class="page-btn">…</div>
+              <div class="page-btn">585</div>
+              <div class="page-btn">›</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── STATS ── -->
+      <div class="page" id="page-stats">
+        <div class="page-header">
+          <div>
+            <div class="page-title">统计分析</div>
+            <div class="page-sub">销售数据与经营分析</div>
+          </div>
+          <div style="display:flex;gap:10px">
+            <select class="select-filter"><option>本月</option><option>上月</option><option>近3月</option><option>近1年</option></select>
+            <button class="btn btn-outline">📥 导出报告</button>
+          </div>
+        </div>
+
+        <div class="tabs">
+          <div class="tab active" onclick="switchTab(this)">销售概览</div>
+          <div class="tab" onclick="switchTab(this)">商品分析</div>
+          <div class="tab" onclick="switchTab(this)">会员分析</div>
+        </div>
+
+        <div class="stat-grid">
+          <div class="stat-card">
+            <div class="stat-label">本月销售额</div>
+            <div class="stat-value orange">¥ 824,300</div>
+            <div class="stat-change up">↑ 18.2% 较上月</div>
+            <div class="stat-icon">💰</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">本月订单数</div>
+            <div class="stat-value">3,142 <span class="stat-unit">单</span></div>
+            <div class="stat-change up">↑ 11.4% 较上月</div>
+            <div class="stat-icon">🧾</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">客单价</div>
+            <div class="stat-value">¥ 262</div>
+            <div class="stat-change up">↑ 6.1% 较上月</div>
+            <div class="stat-icon">📊</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">新增会员</div>
+            <div class="stat-value">681 <span class="stat-unit">人</span></div>
+            <div class="stat-change up">↑ 23.5% 较上月</div>
+            <div class="stat-icon">👥</div>
+          </div>
+        </div>
+
+        <div class="grid-2" style="margin-top:4px">
+          <div class="chart-card">
+            <div class="chart-title">本月每日销售趋势</div>
+            <div class="line-chart-wrap">
+              <div class="line-chart-grid">
+                <div class="grid-line"></div><div class="grid-line"></div>
+                <div class="grid-line"></div><div class="grid-line"></div>
+              </div>
+              <div class="line-chart-bars">
+                <div class="trend-bar" style="height:45%"></div>
+                <div class="trend-bar" style="height:60%"></div>
+                <div class="trend-bar" style="height:38%"></div>
+                <div class="trend-bar" style="height:72%"></div>
+                <div class="trend-bar" style="height:55%"></div>
+                <div class="trend-bar" style="height:85%"></div>
+                <div class="trend-bar" style="height:65%"></div>
+                <div class="trend-bar" style="height:78%"></div>
+                <div class="trend-bar" style="height:50%"></div>
+                <div class="trend-bar" style="height:92%"></div>
+                <div class="trend-bar" style="height:68%"></div>
+                <div class="trend-bar" style="height:80%"></div>
+                <div class="trend-bar highlight" style="height:75%"></div>
+              </div>
+              <div class="line-chart-labels">
+                <span>1</span><span>3</span><span>5</span><span>7</span><span>9</span>
+                <span>11</span><span>13</span><span>15</span><span>17</span><span>19</span>
+                <span>21</span><span>22</span><span>今</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="chart-card">
+            <div class="chart-title">热销商品 TOP 5</div>
+            <table style="width:100%">
+              <thead>
+                <tr>
+                  <th style="padding:8px 0;font-size:12px;background:none;border-bottom:1px solid var(--mi-border)">商品</th>
+                  <th style="padding:8px 0;font-size:12px;background:none;border-bottom:1px solid var(--mi-border);text-align:right">销量</th>
+                  <th style="padding:8px 0;font-size:12px;background:none;border-bottom:1px solid var(--mi-border);text-align:right">销售额</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="padding:10px 0;font-size:13px"><span style="color:var(--mi-orange);font-weight:700;margin-right:8px">01</span>小米15 Pro</td>
+                  <td style="text-align:right;font-weight:600">312</td>
+                  <td style="text-align:right;color:var(--mi-orange);font-weight:600">¥156万</td>
+                </tr>
+                <tr>
+                  <td style="padding:10px 0;font-size:13px"><span style="color:var(--mi-gray);font-weight:700;margin-right:8px">02</span>Redmi K80</td>
+                  <td style="text-align:right;font-weight:600">285</td>
+                  <td style="text-align:right;color:var(--mi-orange);font-weight:600">¥77万</td>
+                </tr>
+                <tr>
+                  <td style="padding:10px 0;font-size:13px"><span style="color:var(--mi-gray);font-weight:700;margin-right:8px">03</span>小米手环9</td>
+                  <td style="text-align:right;font-weight:600">218</td>
+                  <td style="text-align:right;color:var(--mi-orange);font-weight:600">¥6.5万</td>
+                </tr>
+                <tr>
+                  <td style="padding:10px 0;font-size:13px"><span style="color:var(--mi-gray);font-weight:700;margin-right:8px">04</span>小米平板7</td>
+                  <td style="text-align:right;font-weight:600">156</td>
+                  <td style="text-align:right;color:var(--mi-orange);font-weight:600">¥51万</td>
+                </tr>
+                <tr>
+                  <td style="padding:10px 0;font-size:13px;border-bottom:none"><span style="color:var(--mi-gray);font-weight:700;margin-right:8px">05</span>Buds 6 Pro</td>
+                  <td style="text-align:right;font-weight:600;border-bottom:none">134</td>
+                  <td style="text-align:right;color:var(--mi-orange);font-weight:600;border-bottom:none">¥20万</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── SYSTEM ── -->
+      <div class="page" id="page-system">
+        <div class="page-header">
+          <div>
+            <div class="page-title">系统配置</div>
+            <div class="page-sub">门店基础设置与权限管理</div>
+          </div>
+          <button class="btn btn-primary">💾 保存设置</button>
+        </div>
+
+        <div class="grid-2">
+          <div>
+            <div class="card card-body" style="margin-bottom:16px">
+              <div class="config-section">
+                <div class="config-section-title">🏪 门店信息</div>
+                <div class="config-row">
+                  <div class="config-label"><div class="config-name">门店名称</div></div>
+                  <input type="text" value="小米之家·上海中山公园店" style="height:34px;border:1.5px solid var(--mi-border);border-radius:6px;padding:0 10px;font-size:13px;outline:none;font-family:inherit;width:220px">
+                </div>
+                <div class="config-row">
+                  <div class="config-label"><div class="config-name">联系电话</div></div>
+                  <input type="text" value="021-12345678" style="height:34px;border:1.5px solid var(--mi-border);border-radius:6px;padding:0 10px;font-size:13px;outline:none;font-family:inherit;width:220px">
+                </div>
+                <div class="config-row">
+                  <div class="config-label"><div class="config-name">营业时间</div></div>
+                  <input type="text" value="10:00 - 22:00" style="height:34px;border:1.5px solid var(--mi-border);border-radius:6px;padding:0 10px;font-size:13px;outline:none;font-family:inherit;width:220px">
+                </div>
+              </div>
+            </div>
+
+            <div class="card card-body">
+              <div class="config-section" style="margin:0">
+                <div class="config-section-title">🔔 通知设置</div>
+                <div class="config-row">
+                  <div class="config-label">
+                    <div class="config-name">库存预警通知</div>
+                    <div class="config-desc">库存低于预警值时推送提醒</div>
+                  </div>
+                  <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+                </div>
+                <div class="config-row">
+                  <div class="config-label">
+                    <div class="config-name">订单超时提醒</div>
+                    <div class="config-desc">待支付订单超过30分钟自动提醒</div>
+                  </div>
+                  <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+                </div>
+                <div class="config-row">
+                  <div class="config-label">
+                    <div class="config-name">日报自动发送</div>
+                    <div class="config-desc">每日22:00发送当日销售日报</div>
+                  </div>
+                  <div class="toggle" onclick="this.classList.toggle('on')"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="card card-body" style="margin-bottom:16px">
+              <div class="config-section" style="margin:0">
+                <div class="config-section-title">💎 会员积分规则</div>
+                <div class="config-row">
+                  <div class="config-label">
+                    <div class="config-name">消费积分比例</div>
+                    <div class="config-desc">每消费 1 元获得积分数</div>
+                  </div>
+                  <input type="number" value="1" style="height:34px;border:1.5px solid var(--mi-border);border-radius:6px;padding:0 10px;font-size:13px;outline:none;font-family:inherit;width:80px;text-align:center">
+                </div>
+                <div class="config-row">
+                  <div class="config-label">
+                    <div class="config-name">银卡升级门槛</div>
+                    <div class="config-desc">累计积分达到此值升为银卡</div>
+                  </div>
+                  <input type="number" value="2000" style="height:34px;border:1.5px solid var(--mi-border);border-radius:6px;padding:0 10px;font-size:13px;outline:none;font-family:inherit;width:80px;text-align:center">
+                </div>
+                <div class="config-row">
+                  <div class="config-label">
+                    <div class="config-name">金卡升级门槛</div>
+                    <div class="config-desc">累计积分达到此值升为金卡</div>
+                  </div>
+                  <input type="number" value="8000" style="height:34px;border:1.5px solid var(--mi-border);border-radius:6px;padding:0 10px;font-size:13px;outline:none;font-family:inherit;width:80px;text-align:center">
+                </div>
+              </div>
+            </div>
+
+            <div class="card card-body">
+              <div class="config-section" style="margin:0">
+                <div class="config-section-title">👥 用户角色</div>
+                <div class="config-row">
+                  <div class="config-label"><div class="config-name">超级管理员</div><div class="config-desc">全部功能权限</div></div>
+                  <span class="tag tag-orange">1 人</span>
+                </div>
+                <div class="config-row">
+                  <div class="config-label"><div class="config-name">店长</div><div class="config-desc">除系统配置外全部权限</div></div>
+                  <span class="tag tag-blue">2 人</span>
+                </div>
+                <div class="config-row">
+                  <div class="config-label"><div class="config-name">销售店员</div><div class="config-desc">订单、会员、库存查看</div></div>
+                  <span class="tag tag-green">8 人</span>
+                </div>
+                <div style="margin-top:12px">
+                  <button class="btn btn-outline" style="width:100%">⚙️ 管理用户与权限</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /content -->
+  </div><!-- /app-body -->
+</div><!-- /app -->
+
+<!-- ══ MODALS ══ -->
+
+<!-- Product Modal -->
+<div class="modal-overlay" id="modal-product">
+  <div class="modal">
+    <div class="modal-title">新增商品 <span class="modal-close" onclick="closeModal('modal-product')">×</span></div>
+    <div class="modal-form">
+      <div class="form-group"><label>商品名称 *</label><input type="text" placeholder="请输入商品名称"></div>
+      <div class="form-row">
+        <div class="form-group"><label>所属分类 *</label>
+          <select><option>手机数码</option><option>智能家居</option><option>穿戴设备</option><option>配件周边</option></select>
+        </div>
+        <div class="form-group"><label>售价 (¥) *</label><input type="number" placeholder="0.00"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>初始库存 *</label><input type="number" placeholder="0"></div>
+        <div class="form-group"><label>库存预警值</label><input type="number" placeholder="10"></div>
+      </div>
+      <div class="form-group"><label>商品描述</label><textarea placeholder="请输入商品描述（选填）"></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modal-product')">取消</button>
+      <button class="btn btn-primary" onclick="closeModal('modal-product')">确认添加</button>
+    </div>
+  </div>
+</div>
+
+<!-- In/Out Modal -->
+<div class="modal-overlay" id="modal-inout">
+  <div class="modal" style="width:420px">
+    <div class="modal-title">库存调整 <span class="modal-close" onclick="closeModal('modal-inout')">×</span></div>
+    <div class="modal-form">
+      <div class="form-group"><label>操作类型 *</label>
+        <select><option>入库</option><option>出库</option></select>
+      </div>
+      <div class="form-group"><label>商品 *</label>
+        <select><option>小米15 Pro (当前库存: 87)</option><option>小米15 Ultra (当前库存: 5 ⚠️)</option><option>Redmi K80 Pro (当前库存: 142)</option></select>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>变动数量 *</label><input type="number" placeholder="0"></div>
+        <div class="form-group"><label>操作人</label><input type="text" value="管理员" readonly style="background:#fafafa"></div>
+      </div>
+      <div class="form-group"><label>备注</label><textarea placeholder="请输入操作原因（选填）"></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modal-inout')">取消</button>
+      <button class="btn btn-primary" onclick="closeModal('modal-inout')">确认提交</button>
+    </div>
+  </div>
+</div>
+
+<!-- Order Modal -->
+<div class="modal-overlay" id="modal-order">
+  <div class="modal" style="width:520px">
+    <div class="modal-title">创建订单 <span class="modal-close" onclick="closeModal('modal-order')">×</span></div>
+    <div class="modal-form">
+      <div class="form-group"><label>关联会员（选填）</label>
+        <input type="text" placeholder="输入手机号搜索会员">
+      </div>
+      <div class="form-group"><label>添加商品 *</label>
+        <select><option>选择商品...</option><option>小米15 Pro — ¥4,999</option><option>Redmi K80 — ¥1,999</option><option>小米手环9 — ¥249</option></select>
+      </div>
+      <div style="background:#FAFAFA;border-radius:var(--radius);padding:12px;margin-bottom:16px;font-size:13px">
+        <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+          <span>小米15 Pro × 1</span><span style="font-weight:600">¥4,999</span>
+        </div>
+        <div style="color:#999;font-size:12px">点击添加更多商品...</div>
+        <div style="border-top:1px solid var(--mi-border);margin-top:10px;padding-top:10px;display:flex;justify-content:space-between">
+          <span style="font-weight:600">合计</span>
+          <span style="color:var(--mi-orange);font-weight:700;font-size:16px">¥4,999</span>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modal-order')">取消</button>
+      <button class="btn btn-primary" onclick="closeModal('modal-order')">创建并收款</button>
+    </div>
+  </div>
+</div>
+
+<!-- Member Modal -->
+<div class="modal-overlay" id="modal-member">
+  <div class="modal" style="width:420px">
+    <div class="modal-title">新增会员 <span class="modal-close" onclick="closeModal('modal-member')">×</span></div>
+    <div class="modal-form">
+      <div class="form-row">
+        <div class="form-group"><label>姓名 *</label><input type="text" placeholder="请输入姓名"></div>
+        <div class="form-group"><label>手机号 *</label><input type="tel" placeholder="138 0000 0000"></div>
+      </div>
+      <div class="form-group"><label>生日（选填）</label><input type="date"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modal-member')">取消</button>
+      <button class="btn btn-primary" onclick="closeModal('modal-member')">确认注册</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  function doLogin() {
+    document.getElementById('page-login').classList.add('hidden');
+    setTimeout(() => {
+      document.getElementById('page-login').style.display = 'none';
+      document.getElementById('app').classList.add('visible');
+    }, 400);
+  }
+
+  function doLogout() {
+    document.getElementById('app').classList.remove('visible');
+    document.getElementById('page-login').style.display = 'flex';
+    setTimeout(() => document.getElementById('page-login').classList.remove('hidden'), 10);
+  }
+
+  function switchPage(name, el, title) {
+    // nav active
+    document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+    el.classList.add('active');
+    // page switch
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById('page-' + name).classList.add('active');
+    // breadcrumb
+    document.getElementById('breadcrumb-current').textContent = title;
+  }
+
+  function openModal(id) {
+    document.getElementById(id).classList.add('open');
+  }
+
+  function closeModal(id) {
+    document.getElementById(id).classList.remove('open');
+  }
+
+  // close modal on overlay click
+  document.querySelectorAll('.modal-overlay').forEach(overlay => {
+    overlay.addEventListener('click', e => {
+      if (e.target === overlay) overlay.classList.remove('open');
+    });
+  });
+
+  function switchTab(el) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+  }
+</script>
+</body>
+</html>

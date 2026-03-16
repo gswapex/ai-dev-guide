@@ -20,10 +20,10 @@ docs/tasks.md      是否存在？
 ### 情况 A：三个文件都不存在
 → 读取 references/guide.md，启动引导流程。
 
-### 情况 B：project.md 存在，structure.md / tasks.md 不存在
+### 情况 B：docs/project.md 存在，docs/structure.md / docs/tasks.md 不存在
 → AI 主动提示：
 
-> 「我看到你已经有 project.md 了。
+> 「我看到你已经有 docs/project.md 了。
 > 是否现在根据它生成系统结构文档和开发任务清单？
 > 生成后就可以开始开发了。」
 
@@ -61,13 +61,13 @@ docs/tasks.md      是否存在？
 学生确认后，按以下步骤执行：
 
 **Step 1：写入 docs/project.md**
-把引导过程中整理好的内容写入文件。
+把引导过程中整理好的内容，套用 references/templates.md 中「零、project.md 模板」后写入 docs/project.md。
 
 **Step 2：识别课程类型**
-读取 project.md 中的「技术栈」字段，对照 references/templates.md 中的识别规则确定课程类型。
+读取 docs/project.md 中的「技术栈」字段，对照 references/templates.md 中的识别规则确定课程类型。
 
 **Step 3：生成 docs/structure.md**
-套用 references/templates.md 中「一、structure.md 模板」对应课程部分，填入 project.md 的内容后写入。
+套用 references/templates.md 中「一、structure.md 模板」对应课程部分，填入 docs/project.md 的内容后写入。
 
 **Step 3.5：生成 docs/architecture.md（仅 Spring Boot 项目执行）**
 如果课程类型为 Spring Boot，额外执行此步：
@@ -77,7 +77,7 @@ docs/tasks.md      是否存在？
 - 写入 docs/architecture.md
 
 **Step 4：生成 docs/tasks.md**
-根据 project.md 的核心功能列表，套用 references/templates.md 中「三、tasks.md 模板」生成 3～5 个任务后写入。
+根据 docs/project.md 的核心功能列表，套用 references/templates.md 中「三、tasks.md 模板」对应课程部分生成 3～5 个任务后写入。
 Spring Boot 项目的每个任务需同时注明后端目标和前端目标。
 
 **Step 5：完成提示**
@@ -116,17 +116,17 @@ Spring Boot 项目输出：
 ### 必须遵守
 - 每次只做 tasks.md 中的一个任务
 - 任务完成后将状态更新为 ✅，再询问下一个
-- 遇到 project.md 未说明的需求，先列出问题再处理
-- 不超出 project.md 定义的功能范围
+- 遇到 docs/project.md 未说明的需求，先列出问题再处理
+- 不超出 docs/project.md 定义的功能范围
 
 ### 禁止事项
 - 不擅自增加新功能或新页面
-- 不引入 project.md 未提及的第三方库
-- 没有 project.md 时不开始写代码
+- 不引入 docs/project.md 未提及的第三方库
+- 没有 docs/project.md 时不开始写代码
 - 不跳过 structure.md 直接开发
 
 ### 信息不足时
-> 「project.md 中没有说明 [问题]，我有两个方案：
+> 「docs/project.md 中没有说明 [问题]，我有两个方案：
 > A. [方案A]
 > B. [方案B]
 > 你倾向哪个？」
