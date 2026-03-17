@@ -1,6 +1,24 @@
-# ai-dev-guide for OpenCode
+﻿# ai-dev-guide for OpenCode
 
-To install this skill in OpenCode, add it to your `opencode.json` file in the `plugin` array:
+Install this skill by updating `opencode.json` directly.
+
+Use this plugin entry:
+
+```json
+"ai-dev-guide@git+https://github.com/gswapex/ai-dev-guide.git#SKILLS"
+```
+
+## Preferred install flow
+
+Follow these steps in order:
+
+1. Choose the config file to update.
+   Prefer global config: `~/.config/opencode/opencode.json`
+   If the user explicitly wants project-only install, use: `./opencode.json`
+
+2. Read the existing config file if it exists.
+
+3. If the config file does not exist, create it with this minimum structure:
 
 ```json
 {
@@ -11,20 +29,41 @@ To install this skill in OpenCode, add it to your `opencode.json` file in the `p
 }
 ```
 
-You can add this to either:
+4. If the config file already exists:
+   - ensure it is valid JSON
+   - ensure the `plugin` field exists and is an array
+   - append the plugin entry if it is not already present
+   - do not duplicate the same plugin entry
 
-- Global config: `~/.config/opencode/opencode.json`
-- Project config: `./opencode.json`
+5. Save the updated config file.
 
-If your `plugin` array already exists, append this item to it:
+6. Tell the user to restart OpenCode.
+
+## Update existing config
+
+If `plugin` already exists, add this exact item:
 
 ```json
 "ai-dev-guide@git+https://github.com/gswapex/ai-dev-guide.git#SKILLS"
 ```
 
-After saving the config, restart OpenCode.
+## If blocked
 
-After restart, you can ask OpenCode to use this skill for:
+If you cannot edit the config automatically:
+
+- tell the user which config file should be edited
+- provide the exact JSON snippet to add
+- tell the user to restart OpenCode after saving
+
+## Backup install method
+
+If the plugin-based install path cannot be completed, the backup installer is:
+
+`https://raw.githubusercontent.com/gswapex/ai-dev-guide/SKILLS/scripts/install-opencode-skill.ps1`
+
+## Result
+
+After restart, OpenCode should be able to use this skill for:
 
 - project requirement guidance
 - document generation

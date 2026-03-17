@@ -1,4 +1,4 @@
-# ai-dev-guide
+﻿# ai-dev-guide
 
 一个用于教学的软件开发引导 skill。
 
@@ -19,12 +19,11 @@
 Fetch and follow instructions from https://raw.githubusercontent.com/gswapex/ai-dev-guide/refs/heads/SKILLS/.opencode/INSTALL.md
 ```
 
-这会让 OpenCode 读取安装说明，并按 `.opencode/INSTALL.md` 中的规则完成安装。
+这会让 OpenCode 读取远程安装说明，并优先通过 `opencode.json` 的 `plugin` 数组安装本 skill。
 
-对应安装说明文件：
+首选安装说明：
 
 - `https://raw.githubusercontent.com/gswapex/ai-dev-guide/refs/heads/SKILLS/.opencode/INSTALL.md`
-
 
 ---
 
@@ -72,9 +71,8 @@ Fetch and follow instructions from https://raw.githubusercontent.com/gswapex/ai-
 Fetch and follow instructions from https://raw.githubusercontent.com/gswapex/ai-dev-guide/refs/heads/SKILLS/.opencode/INSTALL.md
 ```
 
-如果你需要手动方式作为兜底，可以使用：
+如果 plugin 安装方式无法完成，再使用备用脚本：
 
-- `https://raw.githubusercontent.com/gswapex/ai-dev-guide/refs/heads/SKILLS/.opencode/INSTALL.md`
 - `https://raw.githubusercontent.com/gswapex/ai-dev-guide/SKILLS/scripts/install-opencode-skill.ps1`
 
 ---
