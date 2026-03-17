@@ -1,0 +1,86 @@
+# ai-dev-guide
+
+一个用于教学的软件开发引导 skill。
+
+它的目标是帮助学生：
+
+- 从模糊想法整理出项目需求
+- 生成 `docs/project.md`、`docs/structure.md`、`docs/tasks.md`
+- 在开发阶段按任务推进
+- 在开始编码前先做任务级代码拆解
+
+---
+
+## 安装到本地 OpenCode
+
+推荐直接在 OpenCode 中执行下面这句安装指令：
+
+```text
+Fetch and follow instructions from https://raw.githubusercontent.com/gswapex/ai-dev-guide/refs/heads/SKILLS/.opencode/INSTALL.md
+```
+
+这会让 OpenCode 读取安装说明，并按 `.opencode/INSTALL.md` 中的规则完成安装。
+
+对应安装说明文件：
+
+- `https://raw.githubusercontent.com/gswapex/ai-dev-guide/refs/heads/SKILLS/.opencode/INSTALL.md`
+
+
+---
+
+## 安装后检查
+
+安装完成后，重启 OpenCode。
+
+如果安装成功，OpenCode 将能够从 GitHub 加载这个 skill，并在需要时使用其中的：
+
+- `SKILL.md`
+- `AGENTS.md`
+- `references/*`
+- `commands/*`
+
+---
+
+## 使用方式
+
+安装完成后，在 OpenCode 中使用这个 skill 时，主流程会先检查当前项目里是否存在：
+
+- `docs/project.md`
+- `docs/structure.md`
+- `docs/tasks.md`
+
+然后进入对应流程：
+
+- 都不存在：进入项目需求引导
+- 只有 `docs/project.md`：补生成结构文档和任务清单
+- 三个都存在：进入任务开发流程
+
+可手动触发的快捷命令包括：
+
+- `/ai-dev-guide`
+- `/ai-dev-start`
+- `/ai-dev-init`
+- `/ai-dev-chat-logs`
+
+---
+
+## 更新方式
+
+继续使用同一条安装指令即可：
+
+```text
+Fetch and follow instructions from https://raw.githubusercontent.com/gswapex/ai-dev-guide/refs/heads/SKILLS/.opencode/INSTALL.md
+```
+
+如果你需要手动方式作为兜底，可以使用：
+
+- `https://raw.githubusercontent.com/gswapex/ai-dev-guide/refs/heads/SKILLS/.opencode/INSTALL.md`
+- `https://raw.githubusercontent.com/gswapex/ai-dev-guide/SKILLS/scripts/install-opencode-skill.ps1`
+
+---
+
+## 说明
+
+- 本 skill 本身是教学流程资产，不是业务项目代码仓库
+- 聊天记录导出到用户当前工作空间，不写回 skill 仓库
+- `records/` 是本地忽略目录，不进入 Git
