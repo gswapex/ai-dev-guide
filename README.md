@@ -13,13 +13,13 @@
 
 ## 安装到本地 OpenCode
 
-推荐直接在 OpenCode 中执行下面这句安装指令：
+推荐在 OpenCode 对话中输入下面这句请求，让模型执行安装配置：
 
 ```text
 Fetch and follow instructions from https://raw.githubusercontent.com/gswapex/ai-dev-guide/refs/heads/SKILLS/.opencode/INSTALL.md
 ```
 
-这会让 OpenCode 读取远程安装说明，并优先通过 `opencode.json` 的 `plugin` 数组安装本 skill。
+这会让 OpenCode 模型读取远程安装说明，并按其中步骤把这个 skill 配置到 `opencode.json` 的 `plugin` 数组中。
 
 首选安装说明：
 
