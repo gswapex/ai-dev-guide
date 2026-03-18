@@ -19,11 +19,57 @@
 Fetch and follow instructions from https://raw.githubusercontent.com/gswapex/ai-dev-guide/refs/heads/SKILLS/.opencode/INSTALL.md
 ```
 
-这会让 OpenCode 模型读取远程安装说明，并按其中步骤把这个 skill 安装到 OpenCode 原生的 `skills` 目录中。
+这会让 OpenCode 模型读取远程安装说明，并按其中步骤把这个 skill 安装到 OpenCode 原生的 `skills` 目录中，同时把 `/ai-dev-*` 命令安装到 OpenCode 原生的 `commands` 目录中。
 
 首选安装说明：
 
 - `https://raw.githubusercontent.com/gswapex/ai-dev-guide/refs/heads/SKILLS/.opencode/INSTALL.md`
+
+---
+
+## 基础安装指南
+
+如果你希望手动安装这个 skill，可以按下面步骤操作：
+
+1. 下载仓库 `SKILLS` 分支内容
+2. 选择 skill 安装位置：
+   - 全局安装：`~/.config/opencode/skills/ai-dev-guide`
+   - 项目安装：`./.opencode/skills/ai-dev-guide`
+3. 选择命令安装位置：
+   - 全局安装：`~/.config/opencode/commands`
+   - 项目安装：`./.opencode/commands`
+4. 将以下文件和目录复制到目标 skill 位置：
+   - `SKILL.md`
+   - `AGENTS.md`
+   - `commands/`
+   - `references/`
+   - `examples/`
+   - `projects/`
+5. 将以下命令文件复制到目标 command 位置：
+   - `.opencode/commands/ai-dev-guide.md`
+   - `.opencode/commands/ai-dev-start.md`
+   - `.opencode/commands/ai-dev-init.md`
+   - `.opencode/commands/ai-dev-chat-logs.md`
+6. 确认目标 skill 目录下存在：
+
+```text
+SKILL.md
+```
+
+7. 确认目标 command 目录下存在：
+
+```text
+ai-dev-guide.md
+ai-dev-start.md
+ai-dev-init.md
+ai-dev-chat-logs.md
+```
+
+8. 重启 OpenCode
+
+如果不想手动复制，也可以使用备用脚本：
+
+- `https://raw.githubusercontent.com/gswapex/ai-dev-guide/SKILLS/scripts/install-opencode-skill.ps1`
 
 ---
 
@@ -42,6 +88,11 @@ OpenCode 原生技能发现路径是：
 
 - `~/.config/opencode/skills/<name>/SKILL.md`
 - `./.opencode/skills/<name>/SKILL.md`
+
+OpenCode 原生命令发现路径是：
+
+- `~/.config/opencode/commands/<name>.md`
+- `./.opencode/commands/<name>.md`
 
 ---
 

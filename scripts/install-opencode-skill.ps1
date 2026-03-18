@@ -1,9 +1,10 @@
-param(
+﻿param(
     [string]$RepoOwner = "gswapex",
     [string]$RepoName = "ai-dev-guide",
     [string]$Branch = "SKILLS",
     [string]$SkillName = "ai-dev-guide",
-    [string]$TargetRoot = (Join-Path $env:USERPROFILE ".config\opencode\skills")
+    [string]$TargetRoot = (Join-Path $env:USERPROFILE ".config\opencode\skills"),
+    [string]$CommandRoot = (Join-Path $env:USERPROFILE ".config\opencode\commands")
 )
 
 $ErrorActionPreference = "Stop"
@@ -14,6 +15,7 @@ $zipPath = Join-Path $tempRoot "$Branch.zip"
 $extractPath = Join-Path $tempRoot "src"
 $sourcePath = Join-Path $extractPath "$RepoName-$Branch"
 $targetPath = Join-Path $TargetRoot $SkillName
+$sourceCommandPath = Join-Path $sourcePath ".opencode\commands"
 $copyItems = @(
     "SKILL.md",
     "AGENTS.md",
@@ -27,6 +29,7 @@ $copyItems = @(
 try {
     New-Item -ItemType Directory -Force $tempRoot | Out-Null
     New-Item -ItemType Directory -Force $TargetRoot | Out-Null
+    New-Item -ItemType Directory -Force $CommandRoot | Out-Null
 
     Write-Host "Downloading $RepoName ($Branch) from GitHub..."
     Invoke-WebRequest -Uri $zipUrl -OutFile $zipPath
@@ -54,10 +57,17 @@ try {
         Copy-Item -Path $sourceItem -Destination $targetPath -Recurse -Force
     }
 
+    if (Test-Path $sourceCommandPath) {
+        Get-ChildItem -Path $sourceCommandPath -Filter *.md | ForEach-Object {
+            Copy-Item -Path $_.FullName -Destination $CommandRoot -Force
+        }
+    }
+
     Write-Host ""
     Write-Host "Install complete."
-    Write-Host "Target path: $targetPath"
-    Write-Host "You can now use the ai-dev-guide skill in OpenCode."
+    Write-Host "Skill path: $targetPath"
+    Write-Host "Command path: $CommandRoot"
+    Write-Host "You can now use the ai-dev-guide skill and /ai-dev-* commands in OpenCode."
 }
 finally {
     if (Test-Path $tempRoot) {

@@ -16,11 +16,18 @@ Follow these steps in order:
    If the user explicitly wants project-only install, use:
    `./.opencode/skills/ai-dev-guide`
 
-2. Check whether the target directory already exists.
+2. Choose the target command directory.
+   Prefer global install:
+   `~/.config/opencode/commands`
 
-3. Download the `SKILLS` branch of this repository.
+   If the user explicitly wants project-only install, use:
+   `./.opencode/commands`
 
-4. Copy these files and folders into the target skill directory:
+3. Check whether the target directories already exist.
+
+4. Download the `SKILLS` branch of this repository.
+
+5. Copy these files and folders into the target skill directory:
 
 - `SKILL.md`
 - `AGENTS.md`
@@ -29,13 +36,29 @@ Follow these steps in order:
 - `examples/`
 - `projects/`
 
-5. Verify that this file exists after copying:
+6. Copy these command files into the target command directory:
+
+- `.opencode/commands/ai-dev-guide.md`
+- `.opencode/commands/ai-dev-start.md`
+- `.opencode/commands/ai-dev-init.md`
+- `.opencode/commands/ai-dev-chat-logs.md`
+
+7. Verify that this file exists after copying:
 
 ```text
 <target-skill-directory>/SKILL.md
 ```
 
-6. Tell the user to restart OpenCode if the skill does not appear immediately.
+8. Verify that these commands exist after copying:
+
+```text
+<target-command-directory>/ai-dev-guide.md
+<target-command-directory>/ai-dev-start.md
+<target-command-directory>/ai-dev-init.md
+<target-command-directory>/ai-dev-chat-logs.md
+```
+
+9. Tell the user to restart OpenCode if the skill or commands do not appear immediately.
 
 ## Result
 
@@ -44,12 +67,19 @@ After installation, OpenCode should discover the skill from one of these native 
 - `~/.config/opencode/skills/ai-dev-guide/SKILL.md`
 - `./.opencode/skills/ai-dev-guide/SKILL.md`
 
+And should discover the custom commands from:
+
+- `~/.config/opencode/commands/*.md`
+- `./.opencode/commands/*.md`
+
 ## If blocked
 
 If you cannot complete the copy automatically:
 
 - tell the user which target skill directory should be used
+- tell the user which target command directory should be used
 - tell the user that this skill must be installed into OpenCode's native `skills` directory
+- tell the user that slash commands must be installed into OpenCode's native `commands` directory
 - provide the backup installer script:
 
 `https://raw.githubusercontent.com/gswapex/ai-dev-guide/SKILLS/scripts/install-opencode-skill.ps1`
