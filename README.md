@@ -41,7 +41,6 @@ Fetch and follow instructions from https://raw.githubusercontent.com/gswapex/ai-
 4. 将以下文件和目录复制到目标 skill 位置：
    - `SKILL.md`
    - `AGENTS.md`
-   - `commands/`
    - `references/`
    - `examples/`
    - `projects/`
@@ -82,7 +81,7 @@ ai-dev-chat-logs.md
 - `SKILL.md`
 - `AGENTS.md`
 - `references/*`
-- `commands/*`
+- `projects/*`
 
 OpenCode 原生技能发现路径是：
 

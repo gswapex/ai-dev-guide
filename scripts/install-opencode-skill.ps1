@@ -20,7 +20,6 @@ $copyItems = @(
     "SKILL.md",
     "AGENTS.md",
     "README.md",
-    "commands",
     "references",
     "examples",
     "projects"
@@ -74,3 +73,4 @@ finally {
         Remove-Item -Recurse -Force $tempRoot
     }
 }
+

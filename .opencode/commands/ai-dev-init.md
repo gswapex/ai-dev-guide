@@ -15,4 +15,4 @@ In Chinese, initialize the current project for development:
 
 Do not start coding before the documents are generated.
 
-Follow the installed skill's `SKILL.md` and `AGENTS.md`. If needed, read the skill's internal `commands/ai-dev-init.md` as the detailed reference.
+Follow the installed skill's `SKILL.md`, `AGENTS.md`, and `references/templates.md`.
