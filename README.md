@@ -13,13 +13,13 @@
 
 ## 安装到本地 OpenCode
 
-推荐在 OpenCode 对话中输入下面这句请求，让模型执行安装配置：
+推荐在 OpenCode 对话中输入下面这句请求，让模型执行安装：
 
 ```text
 Fetch and follow instructions from https://raw.githubusercontent.com/gswapex/ai-dev-guide/refs/heads/SKILLS/.opencode/INSTALL.md
 ```
 
-这会让 OpenCode 模型读取远程安装说明，并按其中步骤把这个 skill 配置到 `opencode.json` 的 `plugin` 数组中。
+这会让 OpenCode 模型读取远程安装说明，并按其中步骤把这个 skill 安装到 OpenCode 原生的 `skills` 目录中。
 
 首选安装说明：
 
@@ -31,12 +31,17 @@ Fetch and follow instructions from https://raw.githubusercontent.com/gswapex/ai-
 
 安装完成后，重启 OpenCode。
 
-如果安装成功，OpenCode 将能够从 GitHub 加载这个 skill，并在需要时使用其中的：
+如果安装成功，OpenCode 将能够从本地原生 skills 目录发现这个 skill，并在需要时使用其中的：
 
 - `SKILL.md`
 - `AGENTS.md`
 - `references/*`
 - `commands/*`
+
+OpenCode 原生技能发现路径是：
+
+- `~/.config/opencode/skills/<name>/SKILL.md`
+- `./.opencode/skills/<name>/SKILL.md`
 
 ---
 
@@ -71,7 +76,7 @@ Fetch and follow instructions from https://raw.githubusercontent.com/gswapex/ai-
 Fetch and follow instructions from https://raw.githubusercontent.com/gswapex/ai-dev-guide/refs/heads/SKILLS/.opencode/INSTALL.md
 ```
 
-如果 plugin 安装方式无法完成，再使用备用脚本：
+如果模型无法自动完成复制安装，再使用备用脚本：
 
 - `https://raw.githubusercontent.com/gswapex/ai-dev-guide/SKILLS/scripts/install-opencode-skill.ps1`
 

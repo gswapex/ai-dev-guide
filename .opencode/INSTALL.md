@@ -1,71 +1,55 @@
 ﻿# ai-dev-guide for OpenCode
 
-Install this skill by updating `opencode.json` directly.
+Install this repository as a native OpenCode skill, not as a `plugin`.
 
-Use this plugin entry:
-
-```json
-"ai-dev-guide@git+https://github.com/gswapex/ai-dev-guide.git#SKILLS"
-```
+Do **not** add this repo to the `plugin` array in `opencode.json`.
+That field is for OpenCode plugins. This repository should be placed in OpenCode's skill discovery path so OpenCode can find `SKILL.md`.
 
 ## Preferred install flow
 
 Follow these steps in order:
 
-1. Choose the config file to update.
-   Prefer global config: `~/.config/opencode/opencode.json`
-   If the user explicitly wants project-only install, use: `./opencode.json`
+1. Choose the target skill directory.
+   Prefer global install:
+   `~/.config/opencode/skills/ai-dev-guide`
 
-2. Read the existing config file if it exists.
+   If the user explicitly wants project-only install, use:
+   `./.opencode/skills/ai-dev-guide`
 
-3. If the config file does not exist, create it with this minimum structure:
+2. Check whether the target directory already exists.
 
-```json
-{
-  "$schema": "https://opencode.ai/config.json",
-  "plugin": [
-    "ai-dev-guide@git+https://github.com/gswapex/ai-dev-guide.git#SKILLS"
-  ]
-}
+3. Download the `SKILLS` branch of this repository.
+
+4. Copy these files and folders into the target skill directory:
+
+- `SKILL.md`
+- `AGENTS.md`
+- `commands/`
+- `references/`
+- `examples/`
+- `projects/`
+
+5. Verify that this file exists after copying:
+
+```text
+<target-skill-directory>/SKILL.md
 ```
 
-4. If the config file already exists:
-   - ensure it is valid JSON
-   - ensure the `plugin` field exists and is an array
-   - append the plugin entry if it is not already present
-   - do not duplicate the same plugin entry
-
-5. Save the updated config file.
-
-6. Tell the user to restart OpenCode.
-
-## Update existing config
-
-If `plugin` already exists, add this exact item:
-
-```json
-"ai-dev-guide@git+https://github.com/gswapex/ai-dev-guide.git#SKILLS"
-```
-
-## If blocked
-
-If you cannot edit the config automatically:
-
-- tell the user which config file should be edited
-- provide the exact JSON snippet to add
-- tell the user to restart OpenCode after saving
-
-## Backup install method
-
-If the plugin-based install path cannot be completed, the backup installer is:
-
-`https://raw.githubusercontent.com/gswapex/ai-dev-guide/SKILLS/scripts/install-opencode-skill.ps1`
+6. Tell the user to restart OpenCode if the skill does not appear immediately.
 
 ## Result
 
-After restart, OpenCode should be able to use this skill for:
+After installation, OpenCode should discover the skill from one of these native paths:
 
-- project requirement guidance
-- document generation
-- task-driven development
-- task-level code guidance
+- `~/.config/opencode/skills/ai-dev-guide/SKILL.md`
+- `./.opencode/skills/ai-dev-guide/SKILL.md`
+
+## If blocked
+
+If you cannot complete the copy automatically:
+
+- tell the user which target skill directory should be used
+- tell the user that this skill must be installed into OpenCode's native `skills` directory
+- provide the backup installer script:
+
+`https://raw.githubusercontent.com/gswapex/ai-dev-guide/SKILLS/scripts/install-opencode-skill.ps1`
