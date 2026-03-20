@@ -1,0 +1,12 @@
+{
+  "name": "xiaomi-store-db-init",
+  "version": "1.0.0",
+  "description": "小米之家门店管理系统数据库初始化脚本",
+  "scripts": {
+    "init": "node init.js",
+    "seed": "node seed.js"
+  },
+  "dependencies": {
+    "mysql2": "^3.6.0"
+  }
+}
